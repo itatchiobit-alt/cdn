@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Media CDN</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px 15px 0 0;
+      margin: -20px -20px 20px -20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .upload-section {
+      margin-bottom: 30px;
+    }
+
+    #dropzone {
+      width: 100%;
+      min-height: 200px;
+      border: 3px dashed #764ba2;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9ff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    #dropzone:hover, #dropzone.dragover {
+      background-color: #eef1ff;
+      border-color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    #dropzone i {
+      font-size: 48px;
+      color: #764ba2;
+      margin-bottom: 15px;
+    }
+
+    .dropzone-text {
+      font-size: 1.2rem;
+      color: #555;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .dropzone-hint {
+      font-size: 0.9rem;
+      color: #777;
+      text-align: center;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      margin-top: 15px;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .file-input-label:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    #fileInput {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .gallery-section {
+      margin-top: 30px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #444;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+
+    #files {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      padding: 10px;
+    }
+
+    #files img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background-color: #f5f5f5;
+    }
+
+    #files img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .file-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .file-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .file-icon {
+      font-size: 32px;
+      color: #667eea;
+      min-width: 40px;
+    }
+
+    .file-info {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+
+    .file-link {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+
+    .file-link:hover {
+      background: #5a6fd8;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .loading i {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: #667eea;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 15px;
+        border-radius: 15px;
+      }
+      
+      header {
+        padding: 20px 15px;
+        margin: -15px -15px 15px -15px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      #dropzone {
+        min-height: 160px;
+      }
+      
+      #dropzone i {
+        font-size: 36px;
+      }
+      
+      .dropzone-text {
+        font-size: 1rem;
+      }
+      
+      #files {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+      }
+      
+      #files img {
+        height: 120px;
+      }
+      
+      .file-input-label {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .stat-item {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.7rem;
+      }
+      
+      .subtitle {
+        font-size: 0.9rem;
+      }
+      
+      #files {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+      
+      #files img {
+        height: 100px;
+      }
+      
+      .file-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .file-icon {
+        font-size: 28px;
+      }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #f44336;
+    }
+
+    .toast.info {
+      background: #2196F3;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-cloud-upload-alt"></i> Media CDN</h1>
+      <p class="subtitle">Upload, store, and share your media files instantly. Drag & drop or click to upload.</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value" id="totalFiles">0</div>
+        <div class="stat-label">Total Files</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="imagesCount">0</div>
+        <div class="stat-label">Images</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="otherFiles">0</div>
+        <div class="stat-label">Other Files</div>
+      </div>
+    </div>
+
+    <div class="upload-section">
+      <div id="dropzone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <div class="dropzone-text">Drag & Drop Files Here</div>
+        <div class="dropzone-hint">Supports images, documents, videos, and more</div>
+      </div>
+      
+      <div class="file-input-wrapper">
+        <input type="file" id="fileInput" multiple>
+        <label for="fileInput" class="file-input-label">
+          <i class="fas fa-folder-open"></i> Or Choose Files
+        </label>
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <h2><i class="fas fa-images"></i> Recent Uploads</h2>
+      <div id="files" class="loading">
+        <i class="fas fa-spinner"></i>
+        <div>Loading files...</div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2024 Media CDN | All uploaded files are stored securely in Google Drive</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // DOM Elements
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const container = document.getElementById('files');
+    const toast = document.getElementById('toast');
+    const totalFilesEl = document.getElementById('totalFiles');
+    const imagesCountEl = document.getElementById('imagesCount');
+    const otherFilesEl = document.getElementById('otherFiles');
+
+    // Statistics
+    let stats = {
+      total: 0,
+      images: 0,
+      other: 0
+    };
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      toast.textContent = message;
+      toast.className = 'toast';
+      toast.classList.add(type, 'show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Update statistics display
+    function updateStats() {
+      totalFilesEl.textContent = stats.total;
+      imagesCountEl.textContent = stats.images;
+      otherFilesEl.textContent = stats.other;
+    }
+
+    // Drag and drop events
+    dropzone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+      showToast('Drop files to upload', 'info');
+    });
+
+    dropzone.addEventListener('dragleave', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        showToast(`Uploading ${files.length} file(s)...`, 'info');
+        for(let f of files) uploadFile(f);
+      }
+    });
+
+    // Click to upload
+    dropzone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files.length > 0) {
+        showToast(`Uploading ${files.length} file(s)...`, 'info');
+        for(let f of files) uploadFile(f);
+        fileInput.value = ''; // Reset input
+      }
+    });
+
+    // Upload file function
+    async function uploadFile(file) {
+      // Show uploading state
+      const tempId = 'uploading-' + Date.now();
+      addTempUploadingItem(file.name, tempId);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      try {
+        const res = await fetch("https://lunchverse.free.nf/upload.php", {
+          method: 'POST',
+          body: formData,
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        const data = await res.json();
+        
+        // Remove temporary item
+        const tempEl = document.getElementById(tempId);
+        if (tempEl) tempEl.remove();
+        
+        if (data.ok) {
+          showToast(`"${file.name}" uploaded successfully!`, 'info');
+          addFileToDOM(data);
+          stats.total++;
+          if (data.type === 'image') {
+            stats.images++;
+          } else {
+            stats.other++;
+          }
+          updateStats();
+        } else {
+          showToast(`Failed to upload "${file.name}"`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error uploading "${file.name}"`, 'error');
+        console.error('Upload error:', error);
+      }
+    }
+
+    // Add temporary uploading item
+    function addTempUploadingItem(filename, id) {
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = 'file-card';
+      div.innerHTML = `
+        <div class="file-icon">
+          <i class="fas fa-upload"></i>
+        </div>
+        <div class="file-info">
+          <div class="file-name">${filename}</div>
+          <div style="color: #667eea; font-size: 0.9rem;">
+            <i class="fas fa-spinner fa-spin"></i> Uploading...
+          </div>
+        </div>
+      `;
+      container.prepend(div);
+    }
+
+    // Add file to DOM
+    function addFileToDOM(f) {
+      const fileEl = document.createElement('div');
+      
+      if (f.type === "image") {
+        fileEl.className = 'file-card';
+        fileEl.innerHTML = `
+          <div class="file-icon">
+            <i class="fas fa-image"></i>
+          </div>
+          <div class="file-info">
+            <div class="file-name">${f.name}</div>
+            <a href="${f.url}" target="_blank" class="file-link">
+              <i class="fas fa-external-link-alt"></i> View Image
+            </a>
+          </div>
+        `;
+        
+        // Also add as image thumbnail
+        const img = document.createElement("img");
+        img.src = f.url;
+        img.alt = f.name;
+        img.title = f.name;
+        img.addEventListener('click', () => {
+          window.open(f.url, '_blank');
+        });
+        container.prepend(img);
+      } else {
+        fileEl.className = 'file-card';
+        fileEl.innerHTML = `
+          <div class="file-icon">
+            <i class="fas fa-file"></i>
+          </div>
+          <div class="file-info">
+            <div class="file-name">${f.name}</div>
+            <a href="${f.url}" target="_blank" class="file-link">
+              <i class="fas fa-download"></i> Download File
+            </a>
+          </div>
+        `;
+      }
+      
+      container.prepend(fileEl);
+    }
+
+    // Load existing files
+    async function loadFiles() {
+      try {
+        const res = await fetch("https://lunchverse.free.nf/upload.php", {
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        if (!res.ok) {
+          throw new Error('Failed to load files');
+        }
+        
+        const files = await res.json();
+        
+        // Remove loading message
+        container.className = '';
+        container.innerHTML = '';
+        
+        files.reverse().forEach(f => {
+          addFileToDOM(f);
+          stats.total++;
+          if (f.type === 'image') {
+            stats.images++;
+          } else {
+            stats.other++;
+          }
+        });
+        
+        updateStats();
+        
+        if (files.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
+              <i class="fas fa-cloud" style="font-size: 48px; margin-bottom: 15px; color: #ccc;"></i>
+              <div>No files uploaded yet. Drag & drop files to get started!</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Load files error:', error);
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: #f44336; width: 100%;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+            <div>Failed to load files. Please check your connection.</div>
+          </div>
+        `;
+        showToast('Failed to load files', 'error');
+      }
+    }
+
+    // Initialize
+    loadFiles();
+
+    // Refresh files every 30 seconds
+    setInterval(loadFiles, 30000);
+  </script>
+</body>
+</html>
